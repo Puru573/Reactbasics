@@ -37,5 +37,86 @@
   }
 }
 .banner-card{
-  background-color: lightcoral;
+  background-color: white;
+  width:100vw;
+}
+.banner-img{
+  height: 75vh;
+  width:100%;
+}
+.banner-title{
+  position:absolute;
+  color:white;
+  top:45vh;
+  font-size:2rem;
+
+}
+.banner-text{
+  position:absolute;
+  color:white;
+  /* top:80vh; */
+  top:55vh;
+  left:2vw;
+  margin-right:8vw;
+}
+.movies-list{
+  display:flex;
+  flex-wrap:wrap;
+  padding:1rem;
+  justify-content: center;
+
+}
+.movie-card{
+  width:20vw;
+  margin:1rem;
+  color:white;
+  position:relative
+  
+}
+.movie-button{
+  position:absolute;
+  top:80%;
+}
+
+.movie-title{
+  position:absolute;
+  top:1rem;
+  left:1rem;
+}
+.button-wrapper{
+  display:flex;
+  justify-content: center;
+}
+.pagination{
+  display:flex;
+  justify-content: center;
+}
+@media screen and (max-width:400px){
+  .banner-card{
+    height:20vh;
+
+  }
+  .movie-card{
+    width:40vw;
+    top:3rem;
+    margin:0.1rem
+  }
+  .movie-button{
+    width:80%;
+  }
+  .movie-img{
+    width:40vw;
+  }
+  .banner-img{
+    height:40vh;
+  }
+  .banner-title{
+    top:10vh;
+    left:5vw;
+  }
+  .banner-text{
+    top:16vh;
+    left:5vw;
+    font-size:0.6rem;
+  }
 }
