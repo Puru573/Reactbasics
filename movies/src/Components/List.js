@@ -9,8 +9,9 @@ export default class List extends Component {
     this.state={
       hover:" ",
       parr:[1],//ab tak main konse page par hum,or what page result am i showing
-      currPage:5,
+      currPage:1,
       movies:[],
+
     }
   }
   // this is two eventlistener
@@ -25,6 +26,45 @@ export default class List extends Component {
       hover:'',
     })
   }; 
+
+  changeMovies=async()=>{
+    console.log("changeMovies is called")
+    let res=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=a70924997e02110adcecdf0c4fa26bff&language=en-US&page=${this.state.currPage}`);
+    // console.log(res.data);
+    this.setState({
+      movies:[...res.data.results]//movies ke obj honge[{},{},{}]
+    })
+  }
+
+
+  handlePrevious=()=>{
+    console.log("handleprevious is called");
+    if(this.state.currPage!=1){
+      this.setState({ //setstate checks the two things first it checks the state and second it checks the path
+
+        currPage:this.state.currPage-1
+      },this.changeMovies) //apne aap call ho jayega callback function
+    }
+   
+  }
+  handlePageNum=(pageNum)=>{
+    this.setState({ //setstate checks the two things first it checks the state and second it checks the path
+
+      currPage:pageNum,
+    },this.changeMovies) //apne aap call ho jayega callback function
+  }
+
+
+  handleNext=()=>{ //asynchrounously chalega
+    let tempArr=[];
+    for(let i=1;i<=this.state.parr.length+1;i++){
+      tempArr.push(i);
+    }
+    this.setState({ //setstate checks the two things first it checks the state and second it checks the path
+      parr:[...tempArr],
+      currPage:this.state.currPage+1
+    },this.changeMovies) //apne aap call ho jayega callback function
+  }
 
   async componentDidMount(){
     console.log("componentdidmount is called");
@@ -80,11 +120,11 @@ export default class List extends Component {
                       {/* this is a pagination from bootstrap */}
                     <nav aria-label="Page navigation example">  
                       <ul class="pagination">
-                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item"><a class="page-link" onClick={this.handlePrevious}>Previous</a></li>
                         {
                         this.state.parr.map(pageNum =>(
                         <li class="page-item">
-                          <a class="page-link" href="#">
+                          <a class="page-link" onClick={()=>{this.handlePageNum(pageNum)}}>
                             {pageNum}
                           </a> 
                         </li>
@@ -92,7 +132,7 @@ export default class List extends Component {
                         }
                 
                
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        <li class="page-item"><a class="page-link" onClick={this.handleNext}>Next</a></li>
                       </ul>
                     </nav>
                     </div>
