@@ -11,6 +11,7 @@ export default class List extends Component {
       parr:[1],//ab tak main konse page par hum,or what page result am i showing
       currPage:1,
       movies:[],
+      fm:[] //this will store the id of the movies added to favourites
 
     }
   }
@@ -53,6 +54,24 @@ export default class List extends Component {
       currPage:pageNum,
     },this.changeMovies) //apne aap call ho jayega callback function
   }
+  handleFavourites = (movieObj) => { //jurassic park
+    let localStorageMovies = JSON.parse(localStorage.getItem("movies")) || [];
+   
+    if (this.state.fm.includes(movieObj.id)) {
+      localStorageMovies = localStorageMovies.filter(
+        (movie) => movie.id != movieObj.id
+      );
+    }
+    else localStorageMovies.push(movieObj);
+    console.log(localStorageMovies);
+    
+    localStorage.setItem("movies", JSON.stringify(localStorageMovies));
+
+    let tempData = localStorageMovies.map(movieObj => movieObj.id);
+    this.setState({
+      fm: [...tempData]
+    });
+  }
 
 
   handleNext=()=>{ //asynchrounously chalega
@@ -67,7 +86,7 @@ export default class List extends Component {
   }
 
   async componentDidMount(){
-    console.log("componentdidmount is called");
+    // console.log("componentdidmount is called");
     let res=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=a70924997e02110adcecdf0c4fa26bff&language=en-US&page=${this.state.currPage}`);
     // console.log(res.data);
     this.setState({
@@ -108,7 +127,11 @@ export default class List extends Component {
                             <div className="button-wrapper">
                               {
                                 this.state.hover==movieObj.id && (
-                                <a href="#" class="btn btn-primary movie-button"> Add to favourites</a>
+                                <a 
+                                class="btn btn-primary movie-button" 
+                                onClick={()=>this.handleFavourites(movieObj)}>
+                                  {this.state.fm.includes(movieObj.id)?"Remove from favourite":"Add to favourites"} 
+                                </a>
                               )}
                                
                             </div>
