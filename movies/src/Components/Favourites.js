@@ -10,7 +10,8 @@ export default class Favourites extends Component {
       currGenre:"All genre",
       currText:"",
       limit:5,
-      currpage:1
+      currpage:1,
+
     }
   }
   async componentDidMount(){
@@ -106,6 +107,20 @@ export default class Favourites extends Component {
       currPage:page
     })
   }
+  handleNumber=(num)=>{
+    this.setState({
+      currnumber:num
+    })
+  }
+  handleDelete=(id)=>{
+   let newMovies= this.state.movies.filter((movieObj)=>{
+      return movieObj.id!=id;
+    });
+    this.setState({
+      movies:[...newMovies]
+    })
+    localStorage.setItem("movies",JSON.stringify(newMovies)); //localstorage me store kr dya stirng me convrt krke
+  }
   render() {
     let genreId = {
       28: "Action",
@@ -174,7 +189,7 @@ export default class Favourites extends Component {
         <div class="col favourite-table">
           <div class="row">
             <input type="text" className="col" placeholder="Search" value={this.state.currText} onChange={this.handleText}></input>
-            <input type="number" className="col" placeholder="5"></input>
+            <input type="number" className="col" value={this.state.limit} onChange={(e)=>this.setState({limit:e.target.value})} ></input>
           </div>
         <table class="table">
           <thead>
@@ -193,7 +208,7 @@ export default class Favourites extends Component {
                   <td>{movieObj.popularity }</td>
                   <td>{movieObj.vote_average}</td>
                   <td>
-                    <button class="btn btn-outline-danger">Delete</button>
+                    <button class="btn btn-outline-danger"onClick={()=>this.handleDelete(movieObj.id)}>Delete</button>
                   </td>
                   </tr>
               ))}
