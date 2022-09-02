@@ -7,12 +7,16 @@ export default class Favourites extends Component {
     this.state={
       movies:[],
       genre:[],
-      currGenre:"All genre"
+      currGenre:"All genre",
+      currText:"",
+      limit:5,
+      currpage:1
     }
   }
   async componentDidMount(){
     // let ans=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=a70924997e02110adcecdf0c4fa26bff&language=en-US&page=1`);
     let results=JSON.parse(localStorage.getItem("movies"));
+    console.log(results);
     let genreId = {
       28: "Action",
       12: "Adventure",
@@ -49,7 +53,57 @@ export default class Favourites extends Component {
   }
   handleCurrGenre =(genre)=>{
     this.setState({
-      currGenre:genre
+      currGenre:genre,
+    })
+  }
+  handleText=(e)=>{
+    this.setState({
+      currText:e.target.value
+    })
+  }
+
+  sortPopularityAsc=()=>{
+    let allMovies=this.state.movies;//sari movie aa gyi humare pass
+    allMovies.sort((objA,objB)=>{
+      return objA.popularity-objB.popularity; // for the ascending order
+    });
+    this.setState({
+      movies:[...allMovies]
+    });
+  }
+
+  sortPopularityDec=()=>{
+    let allMovies=this.state.movies;//sari movie aa gyi humare pass
+    allMovies.sort((objA,objB)=>{
+      return objB.popularity-objA.popularity; // for the ascending order
+    });
+    this.setState({
+      movies:[...allMovies]
+    });
+  }
+
+  sortRatingAsc=()=>{
+    let allMovies=this.state.movies;//sari movie aa gyi humare pass
+    allMovies.sort((objA,objB)=>{
+      return objA.vote_average-objB.vote_average; // for the ascending order
+    });
+    this.setState({
+      movies:[...allMovies]
+    });
+  }
+
+  sortRatingDec=()=>{
+    let allMovies=this.state.movies;//sari movie aa gyi humare pass
+    allMovies.sort((objA,objB)=>{
+      return objB.vote_average-objA.vote_average; // for the ascending order
+    });
+    this.setState({
+      movies:[...allMovies]
+    });
+  }
+  handlePageNum=(page)=>{
+    this.setState({
+      currPage:page
     })
   }
   render() {
@@ -74,15 +128,32 @@ export default class Favourites extends Component {
       10752: "War",
       37: "Western",
     };
-    let filteredMovies=[];
-    if(this.state.currGenre!="All Genre"){
-      filteredMovies=this.state.movies.filter(
-        (movieObj)=>genreId[movieObj.genre_ids[0]]==this.state.currGenre);
+    let filteredMovies=this.state.movies;
+    if(this.state.currText===""){
+      filteredMovies=this.state.movies;
+    }
+    else{
+        filteredMovies=filteredMovies.filter((movieObj)=>{
+          let movieName=movieObj.original_title.toLowerCase();
+          return movieName.includes(this.state.currText);//[t,o,p,g,u,n]
+        })
+    }
+    if(this.state.currGenre!="All genre"){
+      filteredMovies=filteredMovies.filter(
+        (movieObj)=>genreId[movieObj.genre_ids[0]]==this.state.currGenre); //agar mera curr genre aciton he and mene jis movie pe clcik kya uska genre bhi action he to usko usi genre me rakhna he
       
     }
-    else filteredMovies=this.state.movies
-    
+    //movieObj ke andar currgenre ki idi aa gyi
+    // else filteredMovies=this.state.movies;
 
+    let numofpages=Math.ceil(filteredMovies.length/this.state.limit);//18/5
+    let pagesArr=[];
+    for(let i=1;i<=numofpages;i++){
+      pagesArr.push(i);//[1,2,3,4]
+    }
+    let si=(this.state.currPage-1)*this.state.limit;
+    let ei=si+this.state.limit-1;
+    filteredMovies=filteredMovies.slice(si,ei+1);
     return (
       <div class="row">
         <div class="col-3 favourite-list">
@@ -102,7 +173,7 @@ export default class Favourites extends Component {
         </div>
         <div class="col favourite-table">
           <div class="row">
-            <input type="text" className="col" placeholder="Search"></input>
+            <input type="text" className="col" placeholder="Search" value={this.state.currText} onChange={this.handleText}></input>
             <input type="number" className="col" placeholder="5"></input>
           </div>
         <table class="table">
@@ -110,8 +181,8 @@ export default class Favourites extends Component {
             <tr>
               <th scope="col">Title</th>
               <th scope="col">Genre</th>
-              <th scope="col">Popularity</th>
-              <th scope="col">Rating</th>
+              <th scope="col"> <i class="fa-sharp fa-solid fa-caret-up" onClick={this.sortPopularityAsc}></i>Popularity<i class="fa-sharp fa-solid fa-caret-down" onClick={this.sortPopularityDec}></i></th>
+              <th scope="col"> <i class="fa-sharp fa-solid fa-caret-up" onClick={this.sortRatingAsc}></i>Rating<i class="fa-sharp fa-solid fa-caret-down" onClick={this.sortRatingDec}></i></th>
             </tr>
             </thead>
             <tbody>
@@ -120,7 +191,6 @@ export default class Favourites extends Component {
                   <td scope="row"><img src={`https://image.tmdb.org/t/p/original${movieObj.backdrop_path}`}style={{width:'8rem'}}/>{movieObj.original_title}</td>
                   <td>{genreId[movieObj.genre_ids[0]]}</td>
                   <td>{movieObj.popularity }</td>
-                  <td>{movieObj.vote_count}</td>
                   <td>{movieObj.vote_average}</td>
                   <td>
                     <button class="btn btn-outline-danger">Delete</button>
@@ -130,7 +200,20 @@ export default class Favourites extends Component {
             </tbody>
         </table>
        </div>
+       <nav aria-label="Page navigation example">
+      <ul class="pagination">
+      {pagesArr.map((page)=>(
+      <li class="page-item"><a class="page-link" onClick={()=>this.handlePageNum(page)}>{page}
+      </a></li>
+      ))}
+            
+   
+      </ul>
+    </nav>
       </div>
+      
+      
+      
     )
   }
 }
